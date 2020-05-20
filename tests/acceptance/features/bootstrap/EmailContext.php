@@ -57,6 +57,10 @@ class EmailContext implements Context {
 	 * @throws \Exception
 	 */
 	public function assertThatEmailContains($address, PyStringNode $content) {
+		if ($this->featureContext->isTestingReplacingUsernames()) {
+			$user = $this->featureContext->getActualUsername($this->featureContext->getCurrentUser());
+			$address = $this->featureContext->getEmailAddressForUser($user);
+		}
 		$expectedContent = \str_replace("\r\n", "\n", $content->getRaw());
 		$expectedContent = $this->featureContext->substituteInLineCodes(
 			$expectedContent
@@ -79,6 +83,10 @@ class EmailContext implements Context {
 	 * @return void
 	 */
 	public function theResetEmailSenderEmailAddressShouldBe($receiverAddress, $senderAddress) {
+		if ($this->featureContext->isTestingReplacingUsernames()) {
+			$user = $this->featureContext->getActualUsername($this->featureContext->getCurrentUser());
+			$receiverAddress = $this->featureContext->getEmailAddressForUser($user);
+		}
 		$actualSenderAddress = EmailHelper::getSenderOfEmail($this->localMailhogUrl, $receiverAddress);
 		Assert::assertStringContainsString(
 			$senderAddress,
@@ -96,6 +104,10 @@ class EmailContext implements Context {
 	 * @throws \Exception
 	 */
 	public function assertThatEmailDoesntExistWithTheAddress($address) {
+		if ($this->featureContext->isTestingReplacingUsernames()) {
+			$user = $this->featureContext->getActualUsername($this->featureContext->getCurrentUser());
+			$address = $this->featureContext->getEmailAddressForUser($user);
+		}
 		Assert::assertFalse(
 			EmailHelper::emailReceived(
 				EmailHelper::getLocalMailhogUrl(), $address
